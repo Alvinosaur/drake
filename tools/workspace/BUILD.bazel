@@ -82,6 +82,7 @@ _DRAKE_EXTERNAL_PACKAGE_INSTALLS = ["@%s//:install" % p for p in [
     "commons_io",
     "curl_internal",
     "fcl",
+    # "geometric_shapes",
     "fmt",
     "gz_math_internal",
     "gz_utils_internal",

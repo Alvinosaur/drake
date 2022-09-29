@@ -1990,10 +1990,11 @@ void BindFreeFunctions(py::module m) {
           py::arg("prog_type"), doc.GetAvailableSolvers.doc)
       .def("Solve",
           py::overload_cast<const MathematicalProgram&,
+              const std::optional<SolverId>&,
               const std::optional<Eigen::VectorXd>&,
               const std::optional<SolverOptions>&>(&solvers::Solve),
-          py::arg("prog"), py::arg("initial_guess") = py::none(),
-          py::arg("solver_options") = py::none(), doc.Solve.doc_3args)
+          py::arg("prog"), py::arg("solver_id") = py::none(), py::arg("initial_guess") = py::none(),
+          py::arg("solver_options") = py::none(), doc.Solve.doc_4args)
       .def("GetProgramType", &solvers::GetProgramType, doc.GetProgramType.doc);
 }
 

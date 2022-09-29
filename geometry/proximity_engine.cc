@@ -30,6 +30,7 @@
 #include "drake/geometry/proximity/volume_to_surface_mesh.h"
 #include "drake/geometry/proximity/vtk_to_volume_mesh.h"
 #include "drake/geometry/read_obj.h"
+// #include "drake/geometry/read_stl.h"
 #include "drake/geometry/utilities.h"
 
 namespace drake {
@@ -159,6 +160,7 @@ struct ReifyData {
   const GeometryId id;
   const ProximityProperties& properties;
   const RigidTransformd X_WG;
+  const double padding=0.0;
 };
 
 // Helper functions to facilitate exercising FCL's broadphase code. FCL has
@@ -512,18 +514,25 @@ class ProximityEngine<T>::Impl : public ShapeReifier {
           std::filesystem::path(mesh.filename()).extension();
       std::transform(extension.begin(), extension.end(), extension.begin(),
                      [](unsigned char c) { return std::tolower(c); });
-      if (extension != ".obj") {
-        throw std::runtime_error(
-            fmt::format("ProximityEngine: expect an Obj file for "
-                        "non-hydroelastics but get {} file ({}) instead.",
-                        extension, mesh.filename()));
-      }
-      // TODO(SeanCurtis-TRI) Add a troubleshooting entry to give more helpful
-      //  advice.
+      if (extension == ".obj") {
+        std::tie(shared_verts, std::ignore, std::ignore) =
+            ReadObjFile(mesh.filename(), mesh.scale(), false /* triangulate */);
+      // } else if (extension == ".stl") {
+        // shared_verts = ReadSTLFileVerticesArmstrong(mesh.filename(), mesh.scale(), data->padding);
+      } else {
+        auto maybe_path = std::filesystem::path(mesh.filename());
+        maybe_path.replace_extension(".obj");
+        if (std::filesystem::exists(maybe_path)) {
+          std::tie(shared_verts, std::ignore, std::ignore) =
+            ReadObjFile(maybe_path.string(), mesh.scale(), false /* triangulate */);
+        } else {
+          throw std::runtime_error(
+              fmt::format("ProximityEngine: expect an Obj or STL file for "
+                          "non-hydroelastics but get {} file ({}) instead.",
+                          extension, mesh.filename()));
 
-      // Don't bother triangulating; we're ignoring the faces.
-      std::tie(shared_verts, std::ignore, std::ignore) =
-          ReadObjFile(mesh.filename(), mesh.scale(), false /* triangulate */);
+        }
+      }
     }
 
     // Note: the strategy here is to use an *invalid* fcl::Convex shape for the
@@ -546,6 +555,57 @@ class ProximityEngine<T>::Impl : public ShapeReifier {
     //  doesn't need resolution hint.
     ProcessGeometriesForDeformableContact(mesh, user_data);
   }
+
+    // shared_ptr<std::vector<Vector3d>> get_vertices_from_stl(std::string filename) {
+    //   // TODO: verify if this is correct: https://stackoverflow.com/questions/36612063/how-to-access-vertex-and-index-array-of-a-mesh-obtained-from-stlreader-in-vtk
+
+    //   // Load the STL.
+    //   auto reader = vtkSmartPointer<vtkSTLReader>::New();
+    //   reader->SetFileName(filename);
+    //   reader->Update();
+
+    //   vtkSmartPointer<vtkPolyData> mesh = reader->GetOutput();
+    //   auto vertices = mesh->GetVerts();
+
+    //   vtkSmartPointer<vtkPoints> points = mesh->GetPoints();
+
+    //   vtkSmartPointer<vtkDataArray> dataArray = points->GetData();
+
+    //   int numberOfFaces = mesh->GetNumberOfCells();
+    //   vtkIdList* faceIndex = new vtkIdList();
+
+    //   for (int i=0; i<numberOfFaces; i++) {
+    //     mesh->GetCellPoints(i, faceIndex);
+
+    //     // Loop over each triangle face to get its vertices
+
+
+    //     auto vertexIndex = faceIndex->GetId(0);
+
+    //     vertexArray[0] = dataArray->GetComponent(vertexIndex, 0);
+
+    //     vertexArray[1] = dataArray->GetComponent(vertexIndex, 1);
+
+    //     vertexArray[2] = dataArray->GetComponent(vertexIndex, 2);
+
+    //     vertexIndex = faceIndex->GetId(1);
+
+    //     vertexArray[3] = dataArray->GetComponent(vertexIndex, 0);
+
+    //     vertexArray[4] = dataArray->GetComponent(vertexIndex, 1);
+
+    //     vertexArray[5] = dataArray->GetComponent(vertexIndex, 2);
+
+    //     vertexIndex = faceIndex->GetId(2);
+
+    //     vertexArray[6] = dataArray->GetComponent(vertexIndex, 0);
+
+    //     vertexArray[7] = dataArray->GetComponent(vertexIndex, 1);
+
+    //     vertexArray[8] = dataArray->GetComponent(vertexIndex, 2);
+
+    //   }
+    // }
 
   void ImplementGeometry(const Convex& convex, void* user_data) override {
     // Don't bother triangulating; Convex supports polygons.

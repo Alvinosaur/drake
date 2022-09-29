@@ -31,6 +31,22 @@ namespace solvers {
  */
 MathematicalProgramResult Solve(
     const MathematicalProgram& prog,
+    const std::optional<SolverId>& solver_id,
+    const std::optional<Eigen::VectorXd>& initial_guess,
+    const std::optional<SolverOptions>& solver_options);
+
+MathematicalProgramResult Solve(
+    const MathematicalProgram& prog,
+    const std::optional<SolverId>& solver_id);
+
+MathematicalProgramResult Solve(
+    const MathematicalProgram& prog,
+    const std::optional<SolverId>& solver_id_input,
+    const std::optional<Eigen::VectorXd>& initial_guess);
+    
+
+MathematicalProgramResult Solve(
+    const MathematicalProgram& prog,
     const std::optional<Eigen::VectorXd>& initial_guess,
     const std::optional<SolverOptions>& solver_options);
 

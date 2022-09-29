@@ -45,7 +45,7 @@ install(
     docs = ["LICENSE.TXT"],
     visibility = ["//tools/install/bazel:__pkg__"],
     deps = [
-        "//bindings/pydrake:install",
+        # "//bindings/pydrake:install",
         "//common:install",
         "//examples:install",
         "//geometry:install",

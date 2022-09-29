@@ -455,14 +455,16 @@ if(WITH_GUROBI)
   endif()
 endif()
 
-option(WITH_MOSEK "Build with support for MOSEK" OFF)
+# option(WITH_MOSEK "Build with support for MOSEK" ON)
 
-if(WITH_MOSEK)
-  list(APPEND BAZEL_CONFIGS --config=mosek)
-endif()
+# if(WITH_MOSEK)
+#   list(APPEND BAZEL_CONFIGS --config=mosek)
+# endif()
+list(APPEND BAZEL_CONFIGS --config=mosek)
+# list(APPEND BAZEL_CONFIGS --config=snopt)
 
 set(WITH_ROBOTLOCOMOTION_SNOPT OFF CACHE BOOL
-  "Build with support for SNOPT using the RobotLocomotion/snopt private GitHub repository"
+  "Build with support for SNOPT using the RobotLocomotion/xzsnopt private GitHub repository"
 )
 
 set(WITH_SNOPT OFF CACHE BOOL

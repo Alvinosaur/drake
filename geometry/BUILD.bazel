@@ -45,6 +45,7 @@ drake_cc_package_library(
         ":proximity_engine",
         ":proximity_properties",
         ":read_obj",
+        # ":read_stl",
         ":rgba",
         ":scene_graph",
         ":scene_graph_inspector",
@@ -357,6 +358,20 @@ drake_cc_library(
         "@tinyobjloader",
     ],
 )
+
+# drake_cc_library(
+#     name = "read_stl",
+#     srcs = ["read_stl.cc"],
+#     hdrs = ["read_stl.h"],
+#     interface_deps = [
+#         "@eigen",
+#     ],
+#     deps = [
+#         "//common:essential",
+#         "@geometric_shapes",
+#     ],
+# )
+
 
 drake_cc_library(
     name = "shape_specification",

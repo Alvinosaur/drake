@@ -27,6 +27,8 @@ load("@drake//tools/workspace/dreal:repository.bzl", "dreal_repository")
 load("@drake//tools/workspace/eigen:repository.bzl", "eigen_repository")
 load("@drake//tools/workspace/expat:repository.bzl", "expat_repository")
 load("@drake//tools/workspace/fcl:repository.bzl", "fcl_repository")
+# load("@drake//tools/workspace/geometric_shapes:repository.bzl", "geometric_shapes_repository")
+# load("@drake//tools/workspace/ros_common_msgs:repository.bzl", "ros_common_msgs_repository")
 load("@drake//tools/workspace/fmt:repository.bzl", "fmt_repository")
 load("@drake//tools/workspace/gflags:repository.bzl", "gflags_repository")
 load("@drake//tools/workspace/gfortran:repository.bzl", "gfortran_repository")
@@ -178,6 +180,10 @@ def add_default_repositories(excludes = [], mirrors = DEFAULT_MIRRORS):
         expat_repository(name = "expat")
     if "fcl" not in excludes:
         fcl_repository(name = "fcl", mirrors = mirrors)
+    # if "geometric_shapes" not in excludes:
+    #     geometric_shapes_repository(name = "geometric_shapes", mirrors = mirrors)
+    # if "ros_common_msgs" not in excludes:
+    #     ros_common_msgs_repository(name = "ros_common_msgs", mirrors = mirrors)
     if "fmt" not in excludes:
         fmt_repository(name = "fmt", mirrors = mirrors)
     if "gflags" not in excludes:
