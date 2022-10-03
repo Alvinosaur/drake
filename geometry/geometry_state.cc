@@ -5,6 +5,7 @@
 #include <memory>
 #include <string>
 #include <utility>
+#include <iostream>
 
 #include <fmt/format.h>
 
@@ -381,6 +382,11 @@ template <typename T>
 bool GeometryState<T>::BelongsToSource(GeometryId geometry_id,
                                        SourceId source_id) const {
   // Confirm valid source id.
+  std::cout << "source_names_: " << std::endl;
+  for (const auto& pair: source_names_) {
+    std::cout << pair.first << ", " << pair.second << std::endl;
+  }
+  std::cout << "query source_id: " << source_id << std::endl;
   FindOrThrow(source_id, source_names_, [source_id](){
     return get_missing_id_message(source_id);
   });
@@ -393,6 +399,11 @@ template <typename T>
 const std::string& GeometryState<T>::GetOwningSourceName(GeometryId id) const {
   SourceId source_id = get_source_id(id);
   return source_names_.at(source_id);
+}
+
+template <typename T>
+const SourceId GeometryState<T>::GetOwningSourceId(GeometryId id) const {
+  return get_source_id(id);
 }
 
 template <typename T>
@@ -1554,6 +1565,11 @@ template <typename T>
 const InternalFrame& GeometryState<T>::ValidateAndGetFrame(
     SourceId source_id, FrameId frame_id) const {
   // Handle the special case of the world frame; source_id will *not* own it.
+  std::cout << "source_frame_id_map_: " << std::endl;
+  for (const auto& pair: source_names_) {
+    std::cout << pair.first << std::endl;
+  }
+  std::cout << "query source_id: " << source_id << std::endl;
   if (frame_id == InternalFrame::world_frame_id()) {
     FindOrThrow(source_id, source_frame_id_map_, [source_id]() {
       return get_missing_id_message(source_id);

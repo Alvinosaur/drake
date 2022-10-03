@@ -461,7 +461,8 @@ endif()
 #   list(APPEND BAZEL_CONFIGS --config=mosek)
 # endif()
 list(APPEND BAZEL_CONFIGS --config=mosek)
-# list(APPEND BAZEL_CONFIGS --config=snopt)
+list(APPEND BAZEL_CONFIGS --config=gurobi)
+list(APPEND BAZEL_CONFIGS --config=snopt)
 
 set(WITH_ROBOTLOCOMOTION_SNOPT OFF CACHE BOOL
   "Build with support for SNOPT using the RobotLocomotion/xzsnopt private GitHub repository"

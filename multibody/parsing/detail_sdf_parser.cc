@@ -672,6 +672,11 @@ void AddJointFromSpecification(
   // P directly. We indicate that by passing a nullopt.
   if (X_PJ.value().IsExactlyIdentity()) X_PJ = std::nullopt;
 
+  std::cout << "Joint parent: " << ResolveJointParentLinkName(diagnostic, joint_spec) << std::endl;
+  std::cout << "Joint child: " << ResolveJointChildLinkName(diagnostic, joint_spec) << std::endl;
+  std::cout << "Joint pose: " << std::endl;
+  std::cout << X_PJ.value() << std::endl;
+
   // These will only be populated for prismatic and revolute joints.
   double lower_limit = 0;
   double upper_limit = 0;
@@ -1285,6 +1290,9 @@ std::vector<ModelInstanceIndex> AddModelsFromSpecification(
   std::vector<LinkInfo> added_link_infos = AddLinksFromSpecification(
       diagnostic, model_instance, model, X_WM, plant, package_map, root_dir);
 
+  std::cout << "added_link_infos.size()" << std::endl;
+  std::cout << added_link_infos.size() << std::endl;
+
   // Add the SDF "model frame" given the model name so that way any frames added
   // to the plant are associated with this current model instance.
   // N.B. This follows SDFormat's convention.
@@ -1324,6 +1332,8 @@ std::vector<ModelInstanceIndex> AddModelsFromSpecification(
     AddJointFromSpecification(
         diagnostic, model, X_WM, joint, model_instance, plant, &joint_types);
   }
+  std::cout << "model.JointCount()" << std::endl;
+  std::cout << model.JointCount() << std::endl;
 
   drake::log()->trace("sdf_parser: Add explicit frames");
   // Add frames at root-level of <model>.
@@ -1333,6 +1343,8 @@ std::vector<ModelInstanceIndex> AddModelsFromSpecification(
     AddFrameFromSpecification(
         diagnostic, frame, model_instance, model_frame, plant);
   }
+  std::cout << "model.FrameCount()" << std::endl;
+  std::cout << model.FrameCount() << std::endl;
 
   drake::log()->trace("sdf_parser: Add drake custom joints");
   if (model.Element()->HasElement("drake:joint")) {

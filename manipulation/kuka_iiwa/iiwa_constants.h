@@ -6,7 +6,7 @@ namespace drake {
 namespace manipulation {
 namespace kuka_iiwa {
 
-constexpr int kIiwaArmNumJoints = 7;
+constexpr int kIiwaArmNumJoints = 18;
 
 /// Returns the maximum joint velocities provided by Kuka.
 /// @return Maximum joint velocities (rad/s).

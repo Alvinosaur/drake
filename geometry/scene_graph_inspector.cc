@@ -175,6 +175,13 @@ const std::string& SceneGraphInspector<T>::GetOwningSourceName(
 }
 
 template <typename T>
+const SourceId SceneGraphInspector<T>::GetOwningSourceId(
+    GeometryId geometry_id) const {
+  DRAKE_DEMAND(state_ != nullptr);
+  return state_->GetOwningSourceId(geometry_id);
+}
+
+template <typename T>
 FrameId SceneGraphInspector<T>::GetFrameId(GeometryId geometry_id) const {
   DRAKE_DEMAND(state_ != nullptr);
   return state_->GetFrameId(geometry_id);

@@ -1884,4 +1884,29 @@ drake_cc_googletest(
     ],
 )
 
-add_lint_tests()
+drake_cc_binary(
+    name = "armstrong_test",
+    srcs = ["armstrong_test.cc"],
+    deps = [
+        ":solver_options",
+        ":solve",
+        ":create_constraint",
+        ":gurobi_solver",
+        ":ipopt_solver",
+        ":mosek_solver",
+        ":snopt_solver",
+        ":nlopt_solver",
+        "//multibody/parsing:parser",
+        "//multibody/inverse_kinematics:inverse_kinematics",
+        "//multibody/plant:contact_results_to_lcm",
+        "//geometry:proximity_properties",
+        "//geometry:scene_graph_inspector",
+        "//geometry:shape_specification",
+        "//geometry:drake_visualizer",
+        "//systems/analysis:simulator",
+        "//systems/lcm:lcm_interface_system",
+        "//visualization:visualization_config_functions",
+    ],
+)
+
+# add_lint_tests()

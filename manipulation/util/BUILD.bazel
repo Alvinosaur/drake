@@ -70,6 +70,16 @@ drake_cc_library(
         "//manipulation/planner:constraint_relaxing_ik",
         "//multibody/parsing",
         "//multibody/plant",
+        "//solvers:solver_options",
+        "//solvers:solve",
+        "//solvers:create_constraint",
+        "//solvers:gurobi_solver",
+        "//solvers:ipopt_solver",
+        "//solvers:mosek_solver",
+        "//solvers:snopt_solver",
+        "//solvers:nlopt_solver",
+        "//multibody/parsing:parser",
+        "//multibody/inverse_kinematics:inverse_kinematics",
     ],
 )
 

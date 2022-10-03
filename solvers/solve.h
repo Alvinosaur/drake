@@ -38,13 +38,7 @@ MathematicalProgramResult Solve(
 MathematicalProgramResult Solve(
     const MathematicalProgram& prog,
     const std::optional<SolverId>& solver_id);
-
-MathematicalProgramResult Solve(
-    const MathematicalProgram& prog,
-    const std::optional<SolverId>& solver_id_input,
-    const std::optional<Eigen::VectorXd>& initial_guess);
     
-
 MathematicalProgramResult Solve(
     const MathematicalProgram& prog,
     const std::optional<Eigen::VectorXd>& initial_guess,

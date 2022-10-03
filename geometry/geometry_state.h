@@ -227,6 +227,8 @@ class GeometryState {
    SceneGraphInspector::GetOwningSourceName(FrameId) const.  */
   const std::string& GetOwningSourceName(FrameId id) const;
 
+  const SourceId GetOwningSourceId(GeometryId id) const;
+
   /** Implementation of SceneGraphInspector::GetName(FrameId) const.  */
   const std::string& GetName(FrameId frame_id) const;
 

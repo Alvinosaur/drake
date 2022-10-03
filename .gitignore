@@ -16,6 +16,8 @@
 /.vscode
 /.history
 
+core
+
 # (Possible) CMake build artifacts
 /build/
 /cmake-build-*/

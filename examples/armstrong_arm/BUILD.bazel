@@ -1,0 +1,151 @@
+# -*- python -*-
+
+load(
+    "@drake//tools/skylark:drake_cc.bzl",
+    "drake_cc_binary",
+    "drake_cc_googletest",
+    "drake_cc_library",
+)
+load(
+    "@drake//tools/skylark:drake_py.bzl",
+    "drake_py_unittest",
+)
+load("//tools/lint:lint.bzl", "add_lint_tests")
+
+package(
+    default_visibility = [":__subpackages__"],
+)
+
+drake_cc_library(
+    name = "iiwa_common",
+    srcs = [
+        "iiwa_common.cc",
+    ],
+    hdrs = [
+        "iiwa_common.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//manipulation/kuka_iiwa:iiwa_constants",
+    ],
+)
+
+drake_cc_library(
+    name = "iiwa_lcm",
+    srcs = ["iiwa_lcm.cc"],
+    hdrs = ["iiwa_lcm.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//manipulation/kuka_iiwa",
+    ],
+)
+
+drake_cc_library(
+    name = "lcm_plan_interpolator",
+    srcs = ["lcm_plan_interpolator.cc"],
+    hdrs = [
+        "lcm_plan_interpolator.h",
+    ],
+    # TODO(hongkai.dai): move this package to manipulation folder.
+    visibility = ["//visibility:public"],
+    deps = [
+        ":iiwa_common",
+        ":iiwa_lcm",
+        "//manipulation/planner:robot_plan_interpolator",
+        "//systems/framework:diagram_builder",
+        "//systems/primitives:demultiplexer",
+    ],
+)
+
+drake_cc_binary(
+    name = "iiwa_controller",
+    srcs = ["iiwa_controller.cc"],
+    data = [
+        ":models",
+        "//manipulation/models/iiwa_description:models",
+    ],
+    deps = [
+        ":iiwa_common",
+        ":lcm_plan_interpolator",
+        "//common:add_text_logging_gflags",
+        "//lcm:drake_lcm",
+        "//systems/analysis:simulator",
+    ],
+)
+
+drake_cc_binary(
+    name = "kuka_simulation",
+    srcs = ["kuka_simulation.cc"],
+    add_test_rule = 1,
+    data = [
+        ":models",
+        "//manipulation/models/iiwa_description:models",
+    ],
+    test_rule_args = ["--simulation_sec=0.1 --target_realtime_rate=0.0"],
+    # TODO(kyle.edwards@kitware.com): Re-enable this test when it no longer
+    # causes timeouts in kcov.
+    test_rule_tags = ["no_kcov"],
+    deps = [
+        ":iiwa_common",
+        ":iiwa_lcm",
+        "//common:add_text_logging_gflags",
+        "//geometry:drake_visualizer",
+        "//lcm",
+        "//multibody/parsing",
+        "//multibody/plant",
+        "//multibody/plant:contact_results_to_lcm",
+        "//systems/analysis:simulator",
+        "//systems/controllers:inverse_dynamics_controller",
+        "//systems/controllers:state_feedback_controller_interface",
+        "//systems/primitives:constant_vector_source",
+        "//systems/primitives:demultiplexer",
+        "//systems/primitives:discrete_derivative",
+    ],
+)
+
+drake_cc_binary(
+    name = "kuka_plan_runner",
+    srcs = ["kuka_plan_runner.cc"],
+    data = [
+        ":models",
+        "//manipulation/models/iiwa_description:models",
+    ],
+    deps = [
+        "//common:find_resource",
+        "//common/trajectories:piecewise_polynomial",
+        "//lcmtypes:iiwa",
+        "//lcmtypes:robot_plan",
+        "//multibody/parsing",
+        "//multibody/plant",
+        "@lcm",
+    ],
+)
+
+drake_cc_binary(
+    name = "move_iiwa_ee",
+    srcs = ["move_iiwa_ee.cc"],
+    data = [
+        ":models",
+        "//manipulation/models/iiwa_description:models",
+    ],
+    deps = [
+        ":iiwa_common",
+        "//common:add_text_logging_gflags",
+        "//lcmtypes:iiwa",
+        "//manipulation/util:move_ik_demo_base",
+        "//math:geometric_transform",
+        "@lcm",
+    ],
+)
+
+alias(
+    name = "models",
+    actual = "//examples/kuka_iiwa_arm/models:models",
+    visibility = ["//visibility:public"],
+)
+
+alias(
+    name = "prod_models",
+    actual = "//examples/kuka_iiwa_arm/models:prod_models",
+    visibility = ["//visibility:public"],
+)

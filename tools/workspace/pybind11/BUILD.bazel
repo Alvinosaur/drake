@@ -152,24 +152,24 @@ filegroup(
     ],
 )
 
-filegroup(
-    name = "pybind_coverage_test_actual_data",
-    testonly = 1,
-    data = [
-        ":class_coverage_test.csv",
-        ":file_coverage_test.csv",
-        ":sample_header_documentation_test.xml",
-    ],
-)
+# filegroup(
+#     name = "pybind_coverage_test_actual_data",
+#     testonly = 1,
+#     data = [
+#         ":class_coverage_test.csv",
+#         ":file_coverage_test.csv",
+#         ":sample_header_documentation_test.xml",
+#     ],
+# )
 
-drake_py_unittest(
-    name = "generate_pybind_coverage_test",
-    data = [
-        "test/sample_header_py.cc",
-        ":pybind_coverage_test_actual_data",
-        ":pybind_coverage_test_expected_data",
-    ],
-    deps = [":mkdoc"],
-)
+# drake_py_unittest(
+#     name = "generate_pybind_coverage_test",
+#     data = [
+#         "test/sample_header_py.cc",
+#         ":pybind_coverage_test_actual_data",
+#         ":pybind_coverage_test_expected_data",
+#     ],
+#     deps = [":mkdoc"],
+# )
 
 add_lint_tests()

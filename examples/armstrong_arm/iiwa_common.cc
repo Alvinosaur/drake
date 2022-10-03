@@ -1,4 +1,4 @@
-#include "drake/examples/kuka_iiwa_arm/iiwa_common.h"
+#include "drake/examples/armstrong_arm/iiwa_common.h"
 
 #include <cmath>
 

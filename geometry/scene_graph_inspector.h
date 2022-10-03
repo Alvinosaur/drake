@@ -276,6 +276,8 @@ class SceneGraphInspector {
    geometry. */
   const std::string& GetOwningSourceName(GeometryId geometry_id) const;
 
+  const SourceId GetOwningSourceId(GeometryId geometry_id) const;
+
   /** Reports the id of the frame to which the given geometry with the given
    `geometry_id` is registered.
    @throws std::exception if `geometry_id` does not map to a registered
