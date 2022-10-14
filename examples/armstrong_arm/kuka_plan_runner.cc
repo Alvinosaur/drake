@@ -187,7 +187,7 @@ void HandlePlan(const ::lcm::ReceiveBuffer*, const std::string&,
 
 int do_main() {
   multibody::MultibodyPlant<double> plant(0.0);
-  auto robot_model_index = multibody::Parser(&plant).AddModelFromFile("/home/armstrong/catkin_ws/src/vision/custom_urdfs_sdfs/shotwell_real_sidecar_NEW.sdf");
+  auto robot_model_index = multibody::Parser(&plant).AddModelFromFile("/home/armstrong/catkin_ws/src/vision/robot_meshes/shotwell_real_sidecar_robot.sdf");
   plant.Finalize();
 
   RobotPlanRunner runner(plant, robot_model_index);

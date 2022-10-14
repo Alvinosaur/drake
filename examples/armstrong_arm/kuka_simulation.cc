@@ -58,7 +58,7 @@ int DoMain() {
     // Adds a plant.
     auto [plant, scene_graph] = multibody::AddMultibodyPlantSceneGraph(
         &builder, FLAGS_sim_dt);
-    std::string sdf_filepath = "/home/armstrong/catkin_ws/src/vision/custom_urdfs_sdfs/shotwell_real_sidecar_NEW.sdf";
+    std::string sdf_filepath = "/home/armstrong/catkin_ws/src/vision/robot_meshes/shotwell_real_sidecar_robot.sdf";
     auto iiwa_instance = multibody::Parser(
         &plant, &scene_graph).AddModelFromFile(sdf_filepath);
     plant.Finalize();

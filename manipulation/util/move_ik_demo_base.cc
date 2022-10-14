@@ -329,7 +329,7 @@ float max_time_s=0.1, int min_attempts=4, float tol=1e-5) {
 std::optional<lcmt_robot_plan> MoveIkDemoBase::Plan(
     const math::RigidTransformd& goal_pose) {
 
-  string sdf_filepath = "/home/armstrong/catkin_ws/src/vision/custom_urdfs_sdfs/shotwell_real_sidecar_NEW.sdf";
+  string sdf_filepath = "/home/armstrong/catkin_ws/src/vision/robot_meshes/shotwell_real_sidecar_robot.sdf";
   float timestep = 0.0;
   drake::systems::DiagramBuilder<double> builder;
   drake::multibody::MultibodyPlant<double>* plant{};
@@ -392,7 +392,22 @@ std::optional<lcmt_robot_plan> MoveIkDemoBase::Plan(
   lcmt_robot_plan plan = EncodeKeyFrames(
       joint_names_, times, q_sol);
     return plan;
-  }
+}
+
+// std::optional<lcmt_robot_plan> MoveIkDemoBase::Plan(
+//     const math::RigidTransformd& goal_pose) {
+//   std::vector<Eigen::VectorXd> q_sol;
+//   (void)goal_pose;
+//   Eigen::VectorXd joints_config(18);
+//   joints_config.block<9,1>(0,0) << 2.38427, 1.2675, 3.11826, 3.33899, -4.74074, 2.72956, 2.1227, 0, 0;
+//   joints_config.block<9,1>(9,0) << -2.73018, -1.24598, 1.37487, 0.606355, -5.38772, -1.30804, -3.03414, 0, 0;
+//   q_sol.push_back(joints_config);
+//   q_sol.push_back(joints_config);
+//   std::vector<double> times{0, 2};
+//   lcmt_robot_plan plan = EncodeKeyFrames(
+//       joint_names_, times, q_sol);
+//     return plan;
+// }
 
 }  // namespace util
 }  // namespace manipulation
