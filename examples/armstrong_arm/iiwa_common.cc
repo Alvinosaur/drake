@@ -12,14 +12,16 @@ void SetPositionControlledIiwaGains(Eigen::VectorXd* Kp,
   // All the gains are for acceleration, not directly responsible for generating
   // torques. These are set to high values to ensure good tracking. These gains
   // are picked arbitrarily.
-  Kp->resize(18);
-  *Kp << 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100;
+  const int num_joints = 18;
+  Kp->resize(num_joints);
+  *Kp = 100 * Eigen::VectorXd::Ones(num_joints);
+  // *Kp << 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100;
   Kd->resize(Kp->size());
   for (int i = 0; i < Kp->size(); i++) {
     // Critical damping gains.
     (*Kd)[i] = 2 * std::sqrt((*Kp)[i]);
   }
-  *Ki = Eigen::VectorXd::Zero(18);
+  *Ki = Eigen::VectorXd::Zero(num_joints);
 }
 
 

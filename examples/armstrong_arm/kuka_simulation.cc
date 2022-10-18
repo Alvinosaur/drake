@@ -36,7 +36,7 @@ DEFINE_double(simulation_sec, std::numeric_limits<double>::infinity(),
 DEFINE_double(target_realtime_rate, 1.0,
               "Playback speed.  See documentation for "
               "Simulator::set_target_realtime_rate() for details.");
-DEFINE_double(sim_dt, 3e-3,
+DEFINE_double(sim_dt, 1e-5,
               "The time step to use for MultibodyPlant model "
               "discretization.");
 
@@ -58,7 +58,7 @@ int DoMain() {
     // Adds a plant.
     auto [plant, scene_graph] = multibody::AddMultibodyPlantSceneGraph(
         &builder, FLAGS_sim_dt);
-    std::string sdf_filepath = "/home/armstrong/catkin_ws/src/vision/robot_meshes/shotwell_real_sidecar_robot.sdf";
+    std::string sdf_filepath = "/home/armstrong/catkin_ws/src/vision/robot_meshes/shotwell_real_sidecar_robot_decomposed.sdf";
     auto iiwa_instance = multibody::Parser(
         &plant, &scene_graph).AddModelFromFile(sdf_filepath);
     plant.Finalize();
@@ -67,7 +67,9 @@ int DoMain() {
 
     // Creates and adds LCM publisher for visualization.
     auto lcm = builder.AddSystem<systems::lcm::LcmInterfaceSystem>();
-    geometry::DrakeVisualizerd::AddToBuilder(&builder, scene_graph, lcm);
+    geometry::DrakeVisualizerParams params;
+    params.role = geometry::Role::kProximity;
+    geometry::DrakeVisualizerd::AddToBuilder(&builder, scene_graph, lcm, params);
     drake::multibody::ConnectContactResultsToDrakeVisualizer(&builder, plant, scene_graph, lcm);
 
     // Since we welded the model to the world above, the only remaining joints

@@ -36,7 +36,7 @@ namespace {
 
 using manipulation::util::MoveIkDemoBase;
 
-std::string sdf_filepath = "/home/armstrong/catkin_ws/src/vision/robot_meshes/shotwell_real_sidecar_robot.sdf";
+std::string sdf_filepath = "/home/armstrong/catkin_ws/src/vision/robot_meshes/shotwell_real_sidecar_robot_decomposed.sdf";
 
 int DoMain() {
   math::RigidTransformd pose(

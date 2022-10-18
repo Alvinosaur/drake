@@ -326,10 +326,46 @@ float max_time_s=0.1, int min_attempts=4, float tol=1e-5) {
 //   return std::nullopt;
 // }
 
+bool check_collision_free(drake::multibody::MultibodyPlant<double>* plant,
+                            drake::systems::Context<double>* plant_context,
+                            drake::multibody::ModelInstanceIndex agent_idx,
+                            const Eigen::VectorXd& joints,
+                            float dist_threshold) {
+
+    /*
+    NOTE: Drake performs caching underneath for geometric evaluations, 
+    and recommends re-creating new query ports and objects for every 
+    geometric evaluation rather than keeping a single, persistent one throughout
+    */
+    plant->SetPositions(plant_context, agent_idx, joints);
+    const auto &query_port = plant->get_geometry_query_input_port();
+    const auto &query_object = query_port.Eval<drake::geometry::QueryObject<double>>(*plant_context);
+
+    // OR IS THIS THE CORRECT USAGE?
+    // const QueryObject<double>& query_object =
+    // scene_graph.get_query_output_port().Eval<QueryObject<double>>(*context);
+
+    std::vector<drake::geometry::SignedDistancePair<double>> signed_distance_pairs =
+            query_object.ComputeSignedDistancePairwiseClosestPoints(0.1);
+    bool is_collision_free = true;
+    for (const auto &signed_distance_pair : signed_distance_pairs) {
+        if (signed_distance_pair.distance < dist_threshold) {
+            // uncomment to display info on the colliding object; warning, very verbose
+            const auto& inspector = query_object.inspector(); const auto&
+                    name_A = inspector.GetName(signed_distance_pair.id_A);
+            const auto&
+                    name_B = inspector.GetName(signed_distance_pair.id_B);
+            drake::log()->info("{} <--> {} is: {}", name_A, name_B, signed_distance_pair.distance);
+            is_collision_free = false;
+        }
+    }
+    return is_collision_free;
+}
+
 std::optional<lcmt_robot_plan> MoveIkDemoBase::Plan(
     const math::RigidTransformd& goal_pose) {
 
-  string sdf_filepath = "/home/armstrong/catkin_ws/src/vision/robot_meshes/shotwell_real_sidecar_robot.sdf";
+  string sdf_filepath = "/home/armstrong/catkin_ws/src/vision/robot_meshes/shotwell_real_sidecar_robot_decomposed.sdf";
   float timestep = 0.0;
   drake::systems::DiagramBuilder<double> builder;
   drake::multibody::MultibodyPlant<double>* plant{};
@@ -342,6 +378,58 @@ std::optional<lcmt_robot_plan> MoveIkDemoBase::Plan(
   (void)robot_model_index;
   plant->Finalize();
   auto diagram = builder.Build();
+  const auto source_id = plant->get_source_id().value();
+
+  const auto& inspector = scene_graph->model_inspector();
+
+  auto all_geom_ids = inspector.GetAllGeometryIds();
+
+  // Exclude each arm's two fingers from collision with one another
+  drake::geometry::GeometrySet left_arm_fingers_set, right_arm_fingers_set;
+
+  // Ignore self-collisions of the other arm not being solved: assumes its current joint config is already valid
+  drake::geometry::GeometrySet right_arm_set, left_arm_set;
+  for (auto& geom_id : all_geom_ids) {
+      const auto frame_id = inspector.GetFrameId(geom_id);
+      const auto geom_model_index = inspector.GetFrameGroup(frame_id);
+
+      std::string geom_name = inspector.GetName(geom_id);
+      std::transform(geom_name.begin(), geom_name.end(), geom_name.begin(), ::tolower);
+
+      if (geom_model_index == robot_model_index) {
+          // if no "collision" in robot component (ie: visual), then ignore
+          if (geom_name.find("collision") == std::string::npos) {
+              scene_graph->RemoveRole(source_id, geom_id,
+                  drake::geometry::Role::kProximity);
+          }
+
+          // Remove collision checking btwn each arm's fingers
+          else if (geom_name.find("left_hande_left_finger_collision") != std::string::npos) {
+              left_arm_fingers_set.Add(geom_id);
+          } else if (geom_name.find("left_hande_right_finger_collision") != std::string::npos) {
+              left_arm_fingers_set.Add(geom_id);
+          } else if (geom_name.find("right_hande_left_finger_collision") != std::string::npos) {
+              right_arm_fingers_set.Add(geom_id);
+          } else if (geom_name.find("right_hande_right_finger_collision") != std::string::npos) {
+              right_arm_fingers_set.Add(geom_id);
+          } else if (
+              (geom_name.find("right_hande") != std::string::npos) ||
+              (geom_name.find("right_link") != std::string::npos)
+          ){
+              cout << "Ignoring " << geom_name << endl;
+              right_arm_set.Add(geom_id);
+          }
+      }
+  }
+  
+  scene_graph->collision_filter_manager().Apply(
+      drake::geometry::CollisionFilterDeclaration()
+          .ExcludeWithin(left_arm_fingers_set)
+          .ExcludeWithin(right_arm_fingers_set)
+          .ExcludeWithin(right_arm_set));
+    
+
+  // Only after all modifications to the plant/scene_graph have been made can we create a context with this updated info
   auto diagram_context= diagram->CreateDefaultContext();
   auto plant_context = &(diagram->GetMutableSubsystemContext(*plant,
   diagram_context.get()));
@@ -386,9 +474,19 @@ std::optional<lcmt_robot_plan> MoveIkDemoBase::Plan(
   // const ContactResults<T>& contact_results =
   //     contact_results_input_port().template Eval<ContactResults<T>>(context);
 
+  Eigen::VectorXd joints_config(18);
+  joints_config.block<9,1>(0,0) << -5.25801, -0.911215, -5.60208, 2.4724, -3.7633, 2.48525, 3.95692, 0, 0;
+  joints_config.block<9,1>(9,0) << -1.11401, -1.70838, -1.06991, 2.03128, 0.327641, 1.3965, -2.7309, 0, 0;
+
+  check_collision_free(plant,
+                        plant_context,
+                        robot_model_index,
+                        joints_config,
+                        0.01);
+
   std::vector<double> times{0, 2};
-  q_sol.push_back(all_solved_joints);
-  q_sol.push_back(all_solved_joints);
+  q_sol.push_back(joints_config);
+  q_sol.push_back(joints_config);
   lcmt_robot_plan plan = EncodeKeyFrames(
       joint_names_, times, q_sol);
     return plan;

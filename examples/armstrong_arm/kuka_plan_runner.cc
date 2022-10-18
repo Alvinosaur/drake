@@ -180,14 +180,14 @@ void HandlePlan(const ::lcm::ReceiveBuffer*, const std::string&,
   std::unique_ptr<systems::Context<double>> context_;
   // int plan_number_{};
   std::unique_ptr<PiecewisePolynomial<double>> plan_;
-  Eigen::VectorXd target_joints_ = Eigen::VectorXd::Zero(18);
+  Eigen::VectorXd target_joints_ = Eigen::VectorXd::Zero(kNumJoints);
   multibody::ModelInstanceIndex robot_model_index_;
   lcmt_iiwa_status iiwa_status_;
 };
 
 int do_main() {
   multibody::MultibodyPlant<double> plant(0.0);
-  auto robot_model_index = multibody::Parser(&plant).AddModelFromFile("/home/armstrong/catkin_ws/src/vision/robot_meshes/shotwell_real_sidecar_robot.sdf");
+  auto robot_model_index = multibody::Parser(&plant).AddModelFromFile("/home/armstrong/catkin_ws/src/vision/robot_meshes/shotwell_real_sidecar_robot_decomposed.sdf");
   plant.Finalize();
 
   RobotPlanRunner runner(plant, robot_model_index);
